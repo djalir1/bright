@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Lato:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 160 25% 96%;
+    --foreground: 160 30% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 160 30% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 30% 10%;
+
+    --primary: 160 45% 28%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 160 15% 90%;
+    --secondary-foreground: 160 30% 15%;
+
+    --muted: 160 10% 92%;
+    --muted-foreground: 160 10% 45%;
+
+    --accent: 160 40% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 160 15% 85%;
+    --input: 160 15% 85%;
+    --ring: 160 45% 28%;
+
+    --radius: 0.75rem;
+
+    /* Custom tokens */
+    --hero-overlay: 160 35% 12%;
+    --glass-bg: 0 0% 100% / 0.12;
+    --glass-border: 0 0% 100% / 0.2;
+    --glass-blur: 20px;
+    --section-dark: 160 30% 8%;
+    --section-dark-foreground: 160 10% 90%;
+    --gold: 38 70% 55%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 160 30% 6%;
+    --foreground: 160 10% 92%;
+
+    --card: 160 25% 10%;
+    --card-foreground: 160 10% 92%;
+
+    --popover: 160 25% 10%;
+    --popover-foreground: 160 10% 92%;
+
+    --primary: 160 45% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 160 20% 15%;
+    --secondary-foreground: 160 10% 90%;
+
+    --muted: 160 15% 18%;
+    --muted-foreground: 160 10% 60%;
+
+    --accent: 160 40% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 160 15% 20%;
+    --input: 160 15% 20%;
+    --ring: 160 45% 40%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  .glass {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid hsl(var(--glass-border));
+  }
+
+  .glass-dark {
+    background: hsl(160 30% 8% / 0.7);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid hsl(0 0% 100% / 0.08);
+  }
+
+  .section-dark {
+    background-color: hsl(var(--section-dark));
+    color: hsl(var(--section-dark-foreground));
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-overlay {
+    background: linear-gradient(
+      to right,
+      hsl(var(--hero-overlay) / 0.85) 0%,
+      hsl(var(--hero-overlay) / 0.6) 50%,
+      hsl(var(--hero-overlay) / 0.3) 100%
+    );
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.8s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}

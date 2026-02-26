@@ -1,0 +1,185 @@
+-- ============================================
+-- Bright Horizon Travel & Tours
+-- Database Schema (PostgreSQL / Supabase)
+-- Last Updated: 2026-02-25
+-- ============================================
+
+-- Admin users (temporary: using hardcoded admin/admin123)
+CREATE TABLE IF NOT EXISTS public.admin_users (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  username TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+INSERT INTO public.admin_users (username, password_hash) VALUES ('admin', 'admin123') ON CONFLICT DO NOTHING;
+
+-- Profiles
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL UNIQUE,
+  email TEXT,
+  full_name TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- User roles
+CREATE TABLE IF NOT EXISTS public.user_roles (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL,
+  role TEXT NOT NULL DEFAULT 'user',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Destination categories (NEW)
+CREATE TABLE IF NOT EXISTS public.destination_categories (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+INSERT INTO public.destination_categories (name, sort_order) VALUES
+  ('National Parks & Wildlife', 1),
+  ('Lakes & Waterways', 2),
+  ('Culture & Cities', 3);
+
+-- Destinations (now with category_id)
+CREATE TABLE IF NOT EXISTS public.destinations (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  category_id UUID REFERENCES public.destination_categories(id),
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  short_description TEXT,
+  image_url TEXT,
+  location TEXT,
+  cultural_significance TEXT,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Tours
+CREATE TABLE IF NOT EXISTS public.tours (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  short_summary TEXT,
+  duration_days INTEGER NOT NULL DEFAULT 1,
+  location TEXT,
+  max_people INTEGER,
+  price NUMERIC NOT NULL DEFAULT 0,
+  image_url TEXT,
+  tour_type TEXT,
+  featured BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Tour images
+CREATE TABLE IF NOT EXISTS public.tour_images (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  tour_id UUID NOT NULL REFERENCES public.tours(id) ON DELETE CASCADE,
+  image_url TEXT NOT NULL,
+  caption TEXT,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Itinerary days
+CREATE TABLE IF NOT EXISTS public.itinerary_days (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  tour_id UUID NOT NULL REFERENCES public.tours(id) ON DELETE CASCADE,
+  day_number INTEGER NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  accommodation TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Itinerary images (multiple per day/accommodation)
+CREATE TABLE IF NOT EXISTS public.itinerary_images (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  itinerary_day_id UUID NOT NULL REFERENCES public.itinerary_days(id) ON DELETE CASCADE,
+  image_url TEXT NOT NULL,
+  caption TEXT,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Enquiries (tour bookings) — now with children_ages
+CREATE TABLE IF NOT EXISTS public.enquiries (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  tour_id UUID REFERENCES public.tours(id),
+  tour_title TEXT,
+  full_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  country TEXT,
+  adults INTEGER,
+  children INTEGER,
+  children_ages TEXT,
+  start_date TEXT,
+  message TEXT,
+  status TEXT DEFAULT 'new',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Custom itinerary requests — now with children_ages
+CREATE TABLE IF NOT EXISTS public.custom_itinerary_requests (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  full_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  country TEXT,
+  destinations TEXT,
+  duration TEXT,
+  travel_dates TEXT,
+  group_size INTEGER,
+  children_ages TEXT,
+  budget_range TEXT,
+  message TEXT,
+  status TEXT DEFAULT 'new',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Academy applications
+CREATE TABLE IF NOT EXISTS public.academy_applications (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  full_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  country TEXT,
+  program_type TEXT NOT NULL DEFAULT 'candidat_libre',
+  program_name TEXT NOT NULL,
+  message TEXT,
+  status TEXT DEFAULT 'new',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Contact messages
+CREATE TABLE IF NOT EXISTS public.contact_messages (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  full_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  subject TEXT,
+  message TEXT NOT NULL,
+  status TEXT DEFAULT 'new',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Gallery posts
+CREATE TABLE IF NOT EXISTS public.gallery_posts (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT,
+  description TEXT,
+  media_url TEXT NOT NULL,
+  media_type TEXT DEFAULT 'image',
+  published BOOLEAN DEFAULT true,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Storage bucket
+INSERT INTO storage.buckets (id, name, public) VALUES ('uploads', 'uploads', true) ON CONFLICT DO NOTHING;
